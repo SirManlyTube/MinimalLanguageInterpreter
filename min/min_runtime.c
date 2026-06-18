@@ -6,7 +6,11 @@ char* ReadFromFile(const char* filename)
 {
 	FILE* file = fopen(filename, "rb");
 
-	assert(file != NULL);
+	if (file == NULL)
+	{
+		fprintf(stderr, "Failed to open file: '%s' does not exist.", filename);
+		exit(-1);
+	}
 
 	fseek(file, 0, SEEK_END);
 	size_t length = (size_t)(ftell(file));
@@ -26,7 +30,26 @@ char* ReadFromFile(const char* filename)
 
 int main(int argc, char* argv[])
 {
-	char* code = ReadFromFile("tests/subroutine.min");
+	char* inputFilename = "";
+	for (int i = 1; i < argc; ++i)
+	{
+		if (strncmp(argv[i], "-file=", 6) == 0)
+		{
+			char* value = strchr(argv[i], '=') + 1;
+			printf("Found argument -file with value: '%s'\n", value);
+			inputFilename = value;
+		}
+		else
+		{
+			printf("Unknown argument: %s\n", argv[i]);
+		}
+	}
+	if (strlen(inputFilename) == 0)
+	{
+		fprintf(stderr, "Please input a valid filename by passing the argument '-file=\"example_file.min\"' when running the interpreter in the command-line.");
+		exit(-1);
+	}
+	char* code = ReadFromFile(inputFilename);
 	RunInterpreter(code);
 	free(code);
 	return 0;
