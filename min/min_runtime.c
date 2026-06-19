@@ -17,7 +17,12 @@ char* ReadFromFile(const char* filename)
 	fseek(file, 0, SEEK_SET);
 
 	char* content = malloc(length + 1);
-	assert(content != NULL);
+
+	if (content == NULL)
+	{
+		fprintf(stderr, "Failed to open file: Could not allocate memory for buffer.\n");
+		exit(-1);
+	}
 
 	fread(content, 1, length, file);
 

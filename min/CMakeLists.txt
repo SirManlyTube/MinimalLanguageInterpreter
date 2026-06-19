@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_C_STANDARD 23)
+
 project("minc" C)
 
 add_executable(minc  "min_runtime.c" "min_interpreter.h" "string.h" "string.c" "vector.h" "vector.c" "stack.c" "stack.h" "precision_delay.h")
