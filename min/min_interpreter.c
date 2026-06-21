@@ -6,6 +6,7 @@
 #include <memory.h>
 #include <assert.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "string.h"
 #include "vector.h"
@@ -34,6 +35,10 @@ Stack subroutineStack;
 
 Vector lines = { 0 };
 
+int programCounter = 1;
+
+int memory[256] = { 0 };
+
 int GetOrLocateSubroutine(const char* subroutineName)
 {
 	for (int i = 0; i < subroutineCount; ++i)
@@ -60,7 +65,7 @@ int GetOrLocateSubroutine(const char* subroutineName)
 				if (strcmp(name, subroutineName) == 0)
 				{
 					SubroutineSymbol symbol = { 0 };
-					strcpy(symbol.name, name);
+					strcpy_s(symbol.name, 31, name);
 					symbol.lineNumber = i + 1;
 					subroutineTable[subroutineCount++] = symbol;
 					return symbol.lineNumber;
@@ -86,7 +91,7 @@ int GetOrAllocateAddress(const char* tokenName)
 	}
 
 	int assignedSlot = variableCount;
-	strcpy(symbolTable[variableCount].name, tokenName);
+	strcpy_s(symbolTable[variableCount].name, 31, tokenName);
 	symbolTable[variableCount].memoryIndex = assignedSlot;
 	++variableCount;
 
@@ -100,6 +105,10 @@ void TrimString(char* str)
 	{
 		str[len - 1] = '\0';
 		--len;
+	}
+	while (*str && isspace(*str))
+	{
+		++str;
 	}
 }
 
@@ -129,16 +138,12 @@ void RunInterpreter(const char* code)
 			Vector_PushBack(&lines, &newString);
 			++currentLineNum;
 		}
-		else
+		else if (code[sourceLength] != '\t')
 		{
 			String_ConcatChar(&((String*)lines.data)[currentLineNum], code[sourceLength]);
 		}
 		++sourceLength;
 	}
-
-	int programCounter = 1;
-
-	int memory[256] = { 0 };
 
 	while (programCounter < lines.size)
 	{
@@ -164,9 +169,9 @@ void RunInterpreter(const char* code)
 		}
 		if (!skipLine)
 		{
-			const char* cmd = s_tokens[0].data;
+			char* cmd = s_tokens[0].data;
 
-			TrimString((char*)cmd);
+			TrimString(cmd);
 
 			if (strcmp(s_tokens[0].data, "END") == 0)
 			{

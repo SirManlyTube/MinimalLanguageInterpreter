@@ -5,6 +5,8 @@
 #include "file_reader.h"
 #include "min_interpreter.h"
 
+#include "min_interpreter_v2.h"
+
 int main(int argc, char* argv[])
 {
 	char* inputFilename = "";
@@ -27,7 +29,7 @@ int main(int argc, char* argv[])
 		exit(-1);
 	}
 	char* code = ReadFromFile(inputFilename);
-	RunInterpreter(code);
+	RunInterpreterV2(code);
 	free(code);
 	return 0;
 }
