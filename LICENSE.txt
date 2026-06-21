@@ -1,4 +1,4 @@
-﻿MinLanguageInterpreter Software License (zlib License)
+﻿MinimalLanguageInterpreter Software License (zlib License)
 Copyright (c) 2026 ManlyTube (https://github.com/SirManlyTube)
 
 This software is provided 'as-is', without any express or implied
