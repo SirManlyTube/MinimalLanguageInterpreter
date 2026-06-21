@@ -6,7 +6,7 @@
 #include <time.h>
 #endif
 
-void PrecisionDelay(double milliseconds)
+void PrecisionDelay(double duration)
 {
 #if defined(_WIN32)
 	LARGE_INTEGER frequency;
@@ -16,7 +16,7 @@ void PrecisionDelay(double milliseconds)
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&start);
 
-	double targetTicks = (milliseconds / 1000.0) * frequency.QuadPart;
+	double targetTicks = (duration / 1000.0) * frequency.QuadPart;
 
 	do
 	{
@@ -27,7 +27,7 @@ void PrecisionDelay(double milliseconds)
 
 	clock_gettime(CLOCK_MONOTONIC, &start);
 
-	double targetSeconds = milliseconds / 1000.0;
+	double targetSeconds = duration / 1000.0;
 
 	while (true)
 	{

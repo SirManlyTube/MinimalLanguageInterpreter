@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "file_reader.h"
 #include "min_interpreter.h"
@@ -9,27 +10,54 @@
 
 int main(int argc, char* argv[])
 {
+	int versionRequested = 1;
 	char* inputFilename = "";
 	for (int i = 1; i < argc; ++i)
 	{
-		if (strncmp(argv[i], "-file=", 6) == 0)
+		if (strcmp(argv[i], "-file") == 0)
 		{
-			char* value = strchr(argv[i], '=') + 1;
-			printf("Found argument -file with value: '%s'\n", value);
+			if (i + 2 > argc)
+			{
+				fprintf(stderr, "Could not find value for argument '%s'.\n", argv[i]);
+				return -1;
+			}
+			const char* value = argv[++i];
 			inputFilename = value;
+		}
+		else if (strcmp(argv[i], "-version") == 0)
+		{
+			if (i + 2 > argc)
+			{
+				fprintf(stderr, "Could not find value for argument '%s'\n", argv[i]);
+				return -1;
+			}
+			int value = (int)strtol(argv[++i], NULL, 10);
+			versionRequested = value;
 		}
 		else
 		{
-			printf("Unknown argument: %s\n", argv[i]);
+			fprintf(stderr, "Unknown argument: %s\n", argv[i]);
 		}
 	}
 	if (strlen(inputFilename) == 0)
 	{
-		fprintf(stderr, "Please input a valid filename by passing the argument '-file=\"example_file.min\"' when running the interpreter in the command-line.");
-		exit(-1);
+		fprintf(stderr, "Please input a valid filename by passing the argument '-file \"example_file.min\"' when running the interpreter in the command-line.");
+		return -1;
 	}
 	char* code = ReadFromFile(inputFilename);
-	RunInterpreterV2(code);
+	switch (versionRequested)
+	{
+		case 1:
+			RunInterpreter(code);
+			break;
+		case 2:
+			RunInterpreterV2(code);
+			break;
+		default:
+			fprintf(stderr, "Invalid version requested: %d. Valid versions: [1, 2]\n", versionRequested);
+			free(code);
+			return -1;
+	}
 	free(code);
 	return 0;
 }

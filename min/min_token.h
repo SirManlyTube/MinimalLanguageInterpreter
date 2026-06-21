@@ -17,7 +17,9 @@ typedef enum TokenType
 	TOKEN_KEYWORD_DIV,
 	TOKEN_KEYWORD_END,
 	TOKEN_IDENTIFIER,
-	TOKEN_NUMBER,
+	TOKEN_INT,
+	TOKEN_FLOAT,
+	TOKEN_DOUBLE,
 	TOKEN_STRING,
 	TOKEN_MINUS,
 	TOKEN_MINUS_MINUS,
@@ -34,7 +36,14 @@ typedef struct Token
 {
 	TokenType type;
 	char lexeme[64];
+	int line;
 } Token;
+
+typedef struct LineIndex
+{
+	int lineNumber;
+	int tokenIndex;
+} LineIndex;
 
 static TokenDefinition g_tokenDefinitions[] = {
 	{.type = TOKEN_MINUS, .lexeme = "-"},

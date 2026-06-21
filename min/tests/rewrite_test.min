@@ -1,0 +1,10 @@
+JUMP 4
+	PRINT 2
+	DELAY 1
+JUMP 4
+	PRINT 3
+	DELAY 1
+JUMP -5
+	PRINT 1
+	DELAY 1
+PRINT "Ready or not, here I come!"

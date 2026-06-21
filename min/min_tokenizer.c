@@ -13,20 +13,23 @@ Vector Tokenize(const char* source)
 	char tokenBuffer[64];
 
 	bool commentMode = false;
+	int currentLine = 1;
 
 	while (*source != '\0')
 	{
 		if (commentMode)
 		{
-			if (*source++ == '\n')
-			{
-				commentMode = false;
-			}
 			continue;
 		}
 
 		if (isspace(*source))
 		{
+			if (*source == '\n')
+			{
+				commentMode = false;
+				++currentLine;
+			}
+
 			++source;
 			continue;
 		}
@@ -45,6 +48,7 @@ Vector Tokenize(const char* source)
 			Token token = { 0 };
 			token.type = TOKEN_STRING;
 			strcpy_s(token.lexeme, 63, tokenBuffer);
+			token.line = currentLine;
 
 			Vector_PushBack(&tokens, &token);
 
@@ -74,24 +78,46 @@ Vector Tokenize(const char* source)
 			Token token = { 0 };
 			token.type = type;
 			strcpy_s(token.lexeme, 63, tokenBuffer);
+			token.line = currentLine;
 
 			Vector_PushBack(&tokens, &token);
 
 			continue;
 		}
 
-		if (isdigit(*source))
+		if (isdigit(*source) || *source == '.')
 		{
+			TokenType numType = TOKEN_INT;
+
+			bool hasDecimal = false;
+
 			int i = 0;
-			while (isdigit(*source) || *source == '\'')
+			while (isdigit(*source) || *source == '.' || *source == '\'')
 			{
+				if (*source == '.')
+				{
+					if (hasDecimal)
+					{
+						fprintf(stderr, "Syntax Error: Number cannot have two decimals!\n");
+						exit(-1);
+					}
+					hasDecimal = true;
+					numType = TOKEN_DOUBLE;
+				}
 				tokenBuffer[i++] = *source++;
 			}
 			tokenBuffer[i] = '\0';
 
+			if (*source == 'f' || *source == 'F')
+			{
+				numType = TOKEN_FLOAT;
+				++source;
+			}
+
 			Token token = { 0 };
-			token.type = TOKEN_NUMBER;
+			token.type = numType;
 			strcpy_s(token.lexeme, 63, tokenBuffer);
+			token.line = currentLine;
 
 			Vector_PushBack(&tokens, &token);
 
@@ -133,6 +159,7 @@ Vector Tokenize(const char* source)
 				Token token = { 0 };
 				token.type = definition.type;
 				strcpy_s(token.lexeme, 63, tokenBuffer);
+				token.line = currentLine;
 
 				Vector_PushBack(&tokens, &token);
 			}
@@ -163,6 +190,7 @@ Vector Tokenize(const char* source)
 					Token token = { 0 };
 					token.type = definition.type;
 					strcpy_s(token.lexeme, 63, tokenBuffer);
+					token.line = currentLine;
 
 					Vector_PushBack(&tokens, &token);
 				}
